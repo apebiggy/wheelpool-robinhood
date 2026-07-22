@@ -4,12 +4,30 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 
-const POOLS = [
-  { id:'spin',   name:'SPIN',   icon:'🎡', intervalH:1,  label:'EVERY HOUR',     entryUsd:2,  entryEth:'0.0008', poolEth:'0.0376', color:'#FF6633', darkBg:'#1a0800' },
-  { id:'surge',  name:'SURGE',  icon:'🌊', intervalH:6,  label:'EVERY 6 HOURS',  entryUsd:5,  entryEth:'0.002',  poolEth:'0.166',  color:'#00DDAA', darkBg:'#001610' },
-  { id:'twelve', name:'TWELVE', icon:'🔥', intervalH:12, label:'EVERY 12 HOURS', entryUsd:10, entryEth:'0.004',  poolEth:'0.380',  color:'#AA44FF', darkBg:'#0e0020' },
-  { id:'mega',   name:'MEGA',   icon:'⚡', intervalH:24, label:'DAILY',          entryUsd:25, entryEth:'0.01',   poolEth:'0.290',  color:'#FFDD00', darkBg:'#1a1600' },
+// Matches the actual Pools tab: 3 periods (HOURLY/DAILY/WEEKLY) × 4 stakes ($2/$5/$10/$25)
+const PERIODS = [
+  { pid:'h1', name:'HOURLY', icon:'🎡', intervalH:1,   label:'EVERY HOUR', color:'#FF6633', darkBg:'#1a0800' },
+  { pid:'d1', name:'DAILY',  icon:'⚡', intervalH:24,  label:'DAILY',      color:'#FFDD00', darkBg:'#1a1600' },
+  { pid:'w1', name:'WEEKLY', icon:'👑', intervalH:168, label:'WEEKLY',     color:'#AA44FF', darkBg:'#0e0020' },
 ];
+const STAKES = [
+  { entryUsd:2,  entryEth:'0.00111', entries:47 },
+  { entryUsd:5,  entryEth:'0.00278', entries:83 },
+  { entryUsd:10, entryEth:'0.00556', entries:38 },
+  { entryUsd:25, entryEth:'0.01389', entries:29 },
+];
+const POOLS = PERIODS.flatMap(p => STAKES.map(s => ({
+  id: `${p.pid}-${s.entryUsd}`,
+  name: p.name,
+  icon: p.icon,
+  intervalH: p.intervalH,
+  label: p.label,
+  entryUsd: s.entryUsd,
+  entryEth: s.entryEth,
+  poolEth: (parseFloat(s.entryEth) * s.entries).toFixed(4),
+  color: p.color,
+  darkBg: p.darkBg,
+})));
 
 const PRIZE_SLOTS = [
   { label:'JACKPOT', icon:'🥇', color:'#FFD700', pct:50 },
@@ -17,7 +35,7 @@ const PRIZE_SLOTS = [
   { label:'3RD',     icon:'🥉', color:'#CD7F32', pct:15 },
 ];
 
-const POOL_POINTS = { 'spin':100,'surge':250,'twelve':500,'mega':1250 };
+const POOL_POINTS_BY_STAKE = { 2:100, 5:250, 10:500, 25:1250 };
 const WALLETS = ['0xa0b1...c2d3','0xf4e5...a6b7','0xa1b2...c3d4','0xb3c4...d5e6',
   '0xd5e6...e7f8','0xe7f8...f9a0','0x1234...5678','0x9abc...def0',
   '0x2468...1357','0xaced...bef0','0x5555...aaaa','0x7777...8888'];
@@ -173,8 +191,7 @@ export default function DrawTheater({ onClose, onPointsEarned, activePerks, user
     setPhase('complete');
 
     if (onPointsEarned && !userWon) {
-      const base = selectedPool.id?.split('-')[0] || selectedPool.id || 'spin';
-      const pts  = (POOL_POINTS[base]||100) * (activePerks?.includes('points-boost')?2:1);
+      const pts = (POOL_POINTS_BY_STAKE[selectedPool.entryUsd]||100) * (activePerks?.includes('points-boost')?2:1);
       onPointsEarned(pts);
       setPointsEarned(pts);
       setTimeout(()=>setPointsEarned(0), 3000);
@@ -215,7 +232,7 @@ export default function DrawTheater({ onClose, onPointsEarned, activePerks, user
       return { id:100-i, pool:selectedPool,
         date:new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),
         time:new Date(ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
-        txHash:tx, txUrl:`https://explorer.robinhoodchain.com/tx/${tx}`,
+        txHash:tx, txUrl:`https://abscan.org/tx/${tx}`,
         winners:PRIZE_SLOTS.map((slot,ri)=>({
           icon:slot.icon,color:slot.color,label:slot.label,
           addr:WALLETS[(i*3+ri)%WALLETS.length],
@@ -299,10 +316,14 @@ export default function DrawTheater({ onClose, onPointsEarned, activePerks, user
               cursor:'pointer',outline:'none',
               backdropFilter:'blur(4px)',
             }}>
-            {POOLS.map(p=>(
-              <option key={p.id} value={p.id}>
-                {p.icon} {p.name} — ${p.entryUsd} · {p.label}
-              </option>
+            {PERIODS.map(period=>(
+              <optgroup key={period.pid} label={`${period.icon} ${period.name} — ${period.label}`}>
+                {POOLS.filter(p=>p.id.startsWith(period.pid+'-')).map(p=>(
+                  <option key={p.id} value={p.id}>
+                    {p.icon} {p.name} — ${p.entryUsd}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
 

@@ -1,15 +1,47 @@
 "use client";
 
-import { useAccount, useConnect, useDisconnect, useBalance } from "wagmi";
+import { useAccount, useConnect, useDisconnect, useBalance, useSwitchChain } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { formatUnits } from "viem";
 import { useState, useEffect } from "react";
+import { robinhoodChain } from "./agw-provider";
+
+// ── Shared: connect + auto add/switch to Robinhood Chain ──────
+async function connectAndEnsureChain(connect: any, switchChainAsync: any) {
+  connect({ connector: injected() });
+
+  // Give the wallet a moment to connect before attempting chain switch
+  setTimeout(async () => {
+    try {
+      await switchChainAsync({ chainId: robinhoodChain.id });
+    } catch (err: any) {
+      // Chain not added to wallet yet — request wallet to add it (EIP-3085)
+      if (typeof window !== "undefined" && (window as any).ethereum) {
+        try {
+          await (window as any).ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: `0x${robinhoodChain.id.toString(16)}`,
+              chainName: robinhoodChain.name,
+              nativeCurrency: robinhoodChain.nativeCurrency,
+              rpcUrls: [robinhoodChain.rpcUrls.default.http[0]],
+              blockExplorerUrls: [robinhoodChain.blockExplorers.default.url],
+            }],
+          });
+        } catch (addErr) {
+          console.error("Failed to add Robinhood Chain to wallet:", addErr);
+        }
+      }
+    }
+  }, 400);
+}
 
 // ── Main connect button (burger menu) ─────────────────────────
 export function ConnectButton() {
   const { address, status } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
+  const { switchChainAsync } = useSwitchChain();
   const { data: balance } = useBalance({ address });
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -57,7 +89,7 @@ export function ConnectButton() {
 
   return (
     <button
-      onClick={() => connect({ connector: injected() })}
+      onClick={() => connectAndEnsureChain(connect, switchChainAsync)}
       style={{
         background: "#0d4a1e", border: "2px solid #1BF26A",
         color: "#1BF26A", padding: "7px 12px",
@@ -71,9 +103,12 @@ export function ConnectButton() {
   );
 }
 
-// ── Compact wallet — inline next to logo ───────────────────────
+// ── Compact wallet / connect — shown inline next to logo ───────
+// Shows CONNECT button when disconnected, wallet pill when connected
 export function CompactWallet() {
   const { address, status } = useAccount();
+  const { connect } = useConnect();
+  const { switchChainAsync } = useSwitchChain();
   const { data: balance } = useBalance({ address });
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -84,19 +119,36 @@ export function CompactWallet() {
     : "0.000";
   const short = (a: string) => `${a.slice(0, 5)}...${a.slice(-3)}`;
 
-  if (!isConnected || !address) return null;
+  if (!mounted) return null;
+
+  if (isConnected && address) {
+    return (
+      <div style={{
+        background: "#0d4a1e", border: "1px solid #44FF4466",
+        color: "#44FF44", padding: "4px 10px",
+        fontSize: "clamp(8px,1.8vw,10px)",
+        fontFamily: "'Press Start 2P',monospace",
+        whiteSpace: "nowrap", lineHeight: 1.6,
+      }}>
+        <div>{short(address)}</div>
+        <div style={{ color: "#9de8b4", fontSize: "clamp(7px,1.5vw,9px)" }}>{eth} ETH</div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{
-      background: "#0d4a1e", border: "1px solid #44FF4466",
-      color: "#44FF44", padding: "4px 10px",
-      fontSize: "clamp(8px,1.8vw,10px)",
-      fontFamily: "'Press Start 2P',monospace",
-      whiteSpace: "nowrap", lineHeight: 1.6,
-    }}>
-      <div>{short(address)}</div>
-      <div style={{ color: "#9de8b4", fontSize: "clamp(7px,1.5vw,9px)" }}>{eth} ETH</div>
-    </div>
+    <button
+      onClick={() => connectAndEnsureChain(connect, switchChainAsync)}
+      style={{
+        background: "#0d4a1e", border: "2px solid #1BF26A",
+        color: "#1BF26A", padding: "6px 12px",
+        cursor: "pointer", fontSize: "clamp(8px,1.8vw,10px)",
+        fontFamily: "'Press Start 2P',monospace",
+        whiteSpace: "nowrap", outline: "none",
+      }}
+    >
+      CONNECT
+    </button>
   );
 }
 
@@ -105,6 +157,7 @@ export function BurgerWallet({ onClose }: { onClose: () => void }) {
   const { address, status } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
+  const { switchChainAsync } = useSwitchChain();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -129,7 +182,7 @@ export function BurgerWallet({ onClose }: { onClose: () => void }) {
 
   return (
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-      <button onClick={() => { connect({ connector: injected() }); onClose(); }} style={{
+      <button onClick={() => { connectAndEnsureChain(connect, switchChainAsync); onClose(); }} style={{
         flex: 1, background: "#0d4a1e", color: "#1BF26A",
         border: "2px solid #1BF26A", padding: "10px", cursor: "pointer",
         fontSize: 10, fontFamily: "'Press Start 2P',monospace", outline: "none",

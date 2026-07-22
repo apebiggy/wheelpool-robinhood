@@ -1914,29 +1914,13 @@ export default function WheelPool(){
               </div>
             ))}
           </div>
-          {/* Robinhood Chain paymaster callout */}
+          {/* Automatic payouts callout */}
           <div style={{background:"#0e2008",border:"1px solid #1BF26A55",padding:"16px",marginBottom:10}}>
-            <div style={{color:"#1BF26A",fontSize:12,marginBottom:10,letterSpacing:1}}>⚡ GAS SPONSORSHIP (ERC-4337)</div>
-            <div style={{fontSize:10,color:"#b0edca",lineHeight:2.4,marginBottom:12}}>
-              Prize payouts always land in your wallet automatically — winners never need to submit a claim transaction.
-              Robinhood Chain supports ERC-4337 account abstraction, which WheelPool plans to use to sponsor gas for
-              pool entries so <span style={{color:"#1BF26A"}}>you won't need ETH just to buy a ticket</span>.
-              This is on the roadmap, funded from the 10% ops budget.
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:5}}>
-              {[
-                ["🤖","KEEPER GAS","Bot calls executeDraw() at draw time","~2–3%"],
-                ["🔮","CHAINLINK VRF","Cost of verifiable random seed per draw","~1–2%"],
-                ["⛽","GAS SPONSORSHIP","ERC-4337 sponsorship for ticket purchases (roadmap)","~1–2%"],
-                ["📈","PROTOCOL REVENUE","Funds dev, liquidity, team","remainder"],
-              ].map(([ic,t,d,pct])=>(
-                <div key={t} style={{display:"flex",alignItems:"center",gap:8,background:"#0e2008",padding:"7px 10px",borderLeft:"2px solid #1BF26A44"}}>
-                  <span style={{fontSize:16,flexShrink:0}}>{ic}</span>
-                  <span style={{color:"#1BF26A",fontSize:10,flexShrink:0,width:90}}>{t}</span>
-                  <span style={{color:"#9de8b4",fontSize:10,flex:1}}>{d}</span>
-                  <span style={{color:"#FFDD00",fontSize:10,flexShrink:0}}>{pct}</span>
-                </div>
-              ))}
+            <div style={{color:"#1BF26A",fontSize:12,marginBottom:10,letterSpacing:1}}>⚡ AUTOMATIC PAYOUTS</div>
+            <div style={{fontSize:10,color:"#b0edca",lineHeight:2.4}}>
+              Prizes are sent directly to winners in the same transaction as the draw —
+              <span style={{color:"#1BF26A"}}> no claim button, no separate step</span>.
+              The moment the draw executes on-chain, winnings land in your wallet.
             </div>
           </div>
           <div style={{background:"#080f09",border:"1px solid #FF664422",padding:"10px 14px",fontSize:10,color:"#c0f0d0",lineHeight:2.2}}>

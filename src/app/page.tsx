@@ -1614,7 +1614,7 @@ export default function WheelPool(){
       {/* ── TITLE + CTA dark band directly below hero ── */}
       <div style={{background:"linear-gradient(180deg,#0f5422 0%,#1a6830 100%)",padding:"36px 20px 32px",textAlign:"center",borderBottom:"2px solid #3a7a22"}}>
         <div style={{fontSize:"clamp(22px,6vw,36px)",color:"#fff",letterSpacing:3,marginBottom:8,fontFamily:"'Press Start 2P',monospace",textShadow:"0 0 30px rgba(27,242,106,.35)"}}>
-          WIN ETH ON <span style={{color:"#1BF26A",textShadow:"0 0 20px #1BF26A"}}>ABSTRACT CHAIN</span>
+          WIN ETH ON <span style={{color:"#1BF26A",textShadow:"0 0 20px #1BF26A"}}>ROBINHOOD CHAIN</span>
         </div>
         <div style={{color:"#c0f0d0",fontSize:"clamp(16px,4vw,20px)",marginBottom:24,fontFamily:"'Press Start 2P',monospace"}}>
           Every draw. Every winner. Paid on-chain.
@@ -1903,7 +1903,7 @@ export default function WheelPool(){
               ["🥇","JACKPOT WINNER","50% of pool","Sent to winner wallet. Same transaction as draw.","#FFD700"],
               ["🥈","2ND PLACE","25% of pool","Sent to winner wallet. Same transaction as draw.","#C0C0C0"],
               ["🥉","3RD PLACE","15% of pool","Sent to winner wallet. Same transaction as draw.","#CD7F32"],
-              ["⚙","OPS + PROTOCOL","10% of pool","Covers: keeper gas, Chainlink VRF, Abstract paymaster + protocol revenue.","#FF6644"],
+              ["⚙","OPS + PROTOCOL","10% of pool","Covers: keeper gas, Chainlink VRF, protocol revenue.","#FF6644"],
             ].map(([ic,l,p,note,c])=>(
               <div key={l} style={{display:"flex",alignItems:"center",gap:8,background:"#0e2008",padding:"8px 12px",borderLeft:`3px solid ${c}`}}>
                 <span style={{fontSize:14,flexShrink:0}}>{ic}</span>
@@ -1916,17 +1916,18 @@ export default function WheelPool(){
           </div>
           {/* Robinhood Chain paymaster callout */}
           <div style={{background:"#0e2008",border:"1px solid #1BF26A55",padding:"16px",marginBottom:10}}>
-            <div style={{color:"#1BF26A",fontSize:12,marginBottom:10,letterSpacing:1}}>⚡ ABSTRACT CHAIN PAYMASTER</div>
+            <div style={{color:"#1BF26A",fontSize:12,marginBottom:10,letterSpacing:1}}>⚡ GAS SPONSORSHIP (ERC-4337)</div>
             <div style={{fontSize:10,color:"#b0edca",lineHeight:2.4,marginBottom:12}}>
-              Robinhood Chain's native account abstraction lets the protocol sponsor gas on behalf of winners.
-              When you receive your prize, <span style={{color:"#1BF26A"}}>you pay zero gas</span> — not even to receive ETH.
-              The paymaster is funded from the 10% ops budget.
+              Prize payouts always land in your wallet automatically — winners never need to submit a claim transaction.
+              Robinhood Chain supports ERC-4337 account abstraction, which WheelPool plans to use to sponsor gas for
+              pool entries so <span style={{color:"#1BF26A"}}>you won't need ETH just to buy a ticket</span>.
+              This is on the roadmap, funded from the 10% ops budget.
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:5}}>
               {[
                 ["🤖","KEEPER GAS","Bot calls executeDraw() at draw time","~2–3%"],
                 ["🔮","CHAINLINK VRF","Cost of verifiable random seed per draw","~1–2%"],
-                ["⛽","PAYMASTER","Sponsors winner gas — zero friction payouts","~1–2%"],
+                ["⛽","GAS SPONSORSHIP","ERC-4337 sponsorship for ticket purchases (roadmap)","~1–2%"],
                 ["📈","PROTOCOL REVENUE","Funds dev, liquidity, team","remainder"],
               ].map(([ic,t,d,pct])=>(
                 <div key={t} style={{display:"flex",alignItems:"center",gap:8,background:"#0e2008",padding:"7px 10px",borderLeft:"2px solid #1BF26A44"}}>
@@ -1949,7 +1950,7 @@ export default function WheelPool(){
 
     <footer style={{background:"#0d4a1e",borderTop:"3px solid #1BF26A",padding:"32px 20px",textAlign:"center"}}>
       <div style={{fontSize:16,letterSpacing:2,marginBottom:7}}><span style={{color:"#FFDD00"}}>Wheel</span><span style={{color:"#44FF44"}}>Pool</span></div>
-      <div style={{color:"#c0f0d0",fontSize:"clamp(11px,2.2vw,14px)"}}> Built on Robinhood Chain · NFT Tickets · Auto Payouts · Keeper + VRF + Paymaster</div>
+      <div style={{color:"#c0f0d0",fontSize:"clamp(11px,2.2vw,14px)"}}> Built on Robinhood Chain · NFT Tickets · Auto Payouts · Chainlink VRF</div>
     </footer>
 
     {mounted&&drawPool&&<DrawTheater onClose={()=>setDrawPool(null)} onPointsEarned={addPoints} activePerks={activePerks}/>}

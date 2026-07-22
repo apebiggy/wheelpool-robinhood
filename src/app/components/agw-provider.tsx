@@ -1,9 +1,7 @@
 "use client";
 
-import { PrivyProvider } from "@privy-io/react-auth";
-import { WagmiProvider, createConfig } from "@privy-io/wagmi";
+import { WagmiProvider, createConfig, http } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { http } from "viem";
 import { defineChain } from "viem";
 import { injected } from "wagmi/connectors";
 
@@ -26,7 +24,7 @@ export const robinhoodChain = defineChain({
 const config = createConfig({
   chains: [robinhoodChain],
   connectors: [
-    injected(), // MetaMask / standard EVM wallets — swap for Robinhood Wallet SDK when available
+    injected(), // MetaMask / standard EVM wallets
   ],
   transports: {
     [robinhoodChain.id]: http(),
@@ -41,25 +39,10 @@ export function NextAbstractWalletProvider({
   children: React.ReactNode;
 }) {
   return (
-    <PrivyProvider
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID_RH!}
-      config={{
-        defaultChain: robinhoodChain,
-        supportedChains: [robinhoodChain],
-        embeddedWallets: {
-          ethereum: { createOnLogin: "users-without-wallets" },
-        },
-        appearance: {
-          theme: "dark",
-          accentColor: "#1BF26A",
-        },
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={config}>
-          {children}
-        </WagmiProvider>
-      </QueryClientProvider>
-    </PrivyProvider>
+    <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={config}>
+        {children}
+      </WagmiProvider>
+    </QueryClientProvider>
   );
 }

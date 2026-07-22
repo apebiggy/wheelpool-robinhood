@@ -1441,7 +1441,7 @@ export default function WheelPool(){
       <div style={{position:"absolute",bottom:24,color:"#3a6a3a",fontSize:"clamp(7px,1.5vw,9px)",letterSpacing:2}}>BUILT ON ROBINHOOD CHAIN</div>
     </div>}
 
-    {/* HEADER — sticky, two-row */}}
+    {/* HEADER — sticky, two-row */}
     <header style={{
       background:"rgba(12,60,24,.98)",
       borderBottom:"3px solid #1BF26A",

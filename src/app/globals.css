@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+/* ── Reset ───────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* overflow-x on html/body — NOT on inner divs, which breaks position:fixed */
+html { overflow-x: hidden; }
+body {
+  overflow-x: hidden;
+  background: #0d4a1e;
+  font-family: 'Press Start 2P', monospace;
+  color: #fff;
+}
+
+/* ── Scrollbar ───────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #FFDD00; }
+::-webkit-scrollbar-track { background: #0f4a0f; }
+
+/* ── Header always on top ────────────────────── */
+header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 300 !important;
+  width: 100% !important;
+}
+
+/* ── Nav hover ───────────────────────────────── */
+.nav-item:hover { color: #FFDD00 !important; }
+
+/* ── Animations ──────────────────────────────── */
+@keyframes blinkAnim {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes spinAnim {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes ringPulse {
+  0%   { transform: scale(1);    opacity: 0.8; }
+  100% { transform: scale(1.8);  opacity: 0; }
+}
+@keyframes sparkFade {
+  0%   { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(0.2); opacity: 0; }
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(0) rotate(0deg) scale(1);          opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg) scale(0.5);  opacity: 0; }
+}
+
+/* ── Header responsive layout ────────────────── */
+
+/* Desktop: logo left-center, wallet right, single row */
+.header-logo  { flex: 1 1 auto; text-align: center; }
+.header-wallet { flex: 0 0 auto; }
+
+/* Mobile: logo full width centered, wallet below full width centered */
+@media (max-width: 600px) {
+  .header-row1 {
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    gap: 8px !important;
+  }
+  .header-logo {
+    width: 100%;
+    justify-content: center;
+    font-size: clamp(20px, 6vw, 28px) !important;
+  }
+  .header-wallet {
+    width: 100%;
+    justify-content: center;
+  }
+  /* Compact paddingTop since header is taller on mobile */
+  .content-area { padding-top: 120px !important; }
+}
+
+/* Hide ETH balance on small screens — address alone is enough */
+@media (max-width: 480px) {
+  .wallet-balance { display: none !important; }
+}
+
+/* ── Ticket glow animation ───────────────────── */
+@keyframes ticketGlow {
+  0%   { box-shadow: 0 0 6px rgba(255,215,0,.3), 0 0 12px rgba(27,242,106,.2); }
+  50%  { box-shadow: 0 0 18px rgba(255,215,0,.7), 0 0 35px rgba(27,242,106,.4), inset 0 0 8px rgba(255,215,0,.05); }
+  100% { box-shadow: 0 0 6px rgba(255,215,0,.3), 0 0 12px rgba(27,242,106,.2); }
+}
+.ticket-card {
+  animation: ticketGlow 2.5s ease-in-out infinite;
+}
+
+/* ── Mobile: wheel even lower ─────────────────── */
+@media (max-width: 600px) {
+  .hero-wheel {
+    top: 72% !important;
+  }
+}
+
+/* ── Remove tap highlight everywhere ─────────── */
+* { -webkit-tap-highlight-color: transparent; }
+button, a, [role="button"] { outline: none; }
+
+/* ── Connect button always visible on mobile ─── */
+@media (max-width: 600px) {
+  .header-wallet {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 4px 0 8px !important;
+  }
+  .header-wallet button,
+  .header-wallet div {
+    font-size: 10px !important;
+  }
+}
+
+/* ── Pool cards: fit 4 on desktop, scroll on mobile ─── */
+.pool-cards-row {
+  display: flex !important;
+  gap: 12px;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+@media (max-width: 700px) {
+  .pool-cards-row {
+    overflow-x: auto !important;
+    padding-bottom: 8px;
+  }
+  .pool-cards-row > div {
+    min-width: 260px !important;
+    flex: 0 0 260px !important;
+  }
+}
+
+/* ── Nav: hide emojis on mobile ────────────── */
+@media (max-width: 480px) {
+  .nav-emoji { display: none; }
+}
+
+/* ── Wallet: swap desktop/mobile views ─────── */
+.wallet-mobile { display: none !important; }
+@media (max-width: 600px) {
+  .wallet-desktop { display: none !important; }
+  .wallet-mobile  { display: flex !important; }
+  .wallet-balance { display: none !important; }
+
+  /* Header row 1 compact on mobile */
+  .header-row1 {
+    padding: 6px 10px !important;
+    gap: 6px !important;
+  }
+  .header-logo {
+    font-size: 22px !important;
+  }
+}
+
+/* ── Hero wheel: lower on mobile ───────────── */
+@media (max-width: 600px) {
+  .hero-wheel {
+    top: 80% !important;
+  }
+}
+
+/* ── Header mobile fixes ────────────────────── */
+@media (max-width: 600px) {
+  /* Logo always full width centered */
+  .header-logo {
+    order: 0 !important;
+    width: 100% !important;
+    justify-content: center !important;
+    font-size: 24px !important;
+    padding: 6px 0 2px !important;
+  }
+  /* Wallet row below logo, centered */
+  .header-wallet {
+    order: 1 !important;
+    width: 100% !important;
+    justify-content: center !important;
+    padding-bottom: 6px !important;
+  }
+  /* Stack header rows */
+  .header-row1 {
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 4px 12px !important;
+    gap: 4px !important;
+  }
+  /* Hero wheel lower */
+  .hero-wheel {
+    top: 56% !important;
+  }
+  /* Ensure hero image tall enough */
+  .hero-img {
+    max-height: 680px !important;
+    min-height: 580px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-wheel {
+    top: 60% !important;
+  }
+}
+
+/* ── Splash screen loading bar ──────────────── */
+@keyframes splashLoad {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* ── Compact wallet desktop only ────────────── */
+.compact-wallet-desktop { display: flex; align-items: center; }
+@media (max-width: 600px) {
+  .compact-wallet-desktop { display: none !important; }
+}

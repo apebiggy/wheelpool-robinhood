@@ -232,7 +232,7 @@ export default function DrawTheater({ onClose, onPointsEarned, activePerks, user
       return { id:100-i, pool:selectedPool,
         date:new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),
         time:new Date(ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
-        txHash:tx, txUrl:`https://abscan.org/tx/${tx}`,
+        txHash:tx, txUrl:`https://explorer.robinhoodchain.com/tx/${tx}`,
         winners:PRIZE_SLOTS.map((slot,ri)=>({
           icon:slot.icon,color:slot.color,label:slot.label,
           addr:WALLETS[(i*3+ri)%WALLETS.length],
@@ -260,10 +260,10 @@ export default function DrawTheater({ onClose, onPointsEarned, activePerks, user
       fontFamily:"'Press Start 2P',monospace",
       display:'flex',flexDirection:'column',overflow:'auto',
     }}>
-      {/* Penguin background — full scale */}
+      {/* Penguin background — fixed so it covers full scroll height, not just first viewport */}
       {bgImage && (
         <div style={{
-          position:'absolute',inset:0,zIndex:0,
+          position:'fixed',inset:0,zIndex:0,
           backgroundImage:`url(${bgImage})`,
           backgroundSize:'cover',backgroundPosition:'center top',
           backgroundRepeat:'no-repeat',
@@ -272,7 +272,7 @@ export default function DrawTheater({ onClose, onPointsEarned, activePerks, user
           <div style={{position:'absolute',inset:0,background:'rgba(6,20,6,0.82)'}}/>
         </div>
       )}
-      {!bgImage && <div style={{position:'absolute',inset:0,background:'#0d4a1e',zIndex:0}}/>}
+      {!bgImage && <div style={{position:'fixed',inset:0,background:'#0d4a1e',zIndex:0}}/>}
 
       <Confetti active={confetti}/>
       <div style={{position:'relative',zIndex:1,display:'flex',flexDirection:'column',flex:1}}>

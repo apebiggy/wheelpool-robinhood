@@ -1937,6 +1937,6 @@ export default function WheelPool(){
       <div style={{color:"#c0f0d0",fontSize:"clamp(11px,2.2vw,14px)"}}> Built on Robinhood Chain · NFT Tickets · Auto Payouts · Chainlink VRF</div>
     </footer>
 
-    {mounted&&drawPool&&<DrawTheater onClose={()=>setDrawPool(null)} onPointsEarned={addPoints} activePerks={activePerks}/>}
+    {mounted&&drawPool&&<DrawTheater onClose={()=>setDrawPool(null)} onPointsEarned={addPoints} activePerks={activePerks} userTickets={tickets} bgImage={HERO}/>}
     {mounted&&mintPool&&<MintModal pool={mintPool} onClose={()=>setMintPool(null)} onMinted={t=>{setTickets(p=>[t,...p]);setMintPool(null);setNav("tickets");}}/>}
   </div>);}

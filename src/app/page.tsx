@@ -71,7 +71,7 @@ const RARITIES=[
   {name:"Epic",     color:"#BB44FF",weight:8},
   {name:"Legendary",color:"#FFDD00",weight:2},
 ];
-// Robinhood Chain CT legends on the wheel — green palette
+// Abstract Chain CT legends on the wheel — green palette
 const WHEEL_SEGS=[
   {c:"#1BF26A", v:"Cygaar"},    // Abstract bright green
   {c:"#0cba48", v:"Murad"},     // mid green
@@ -372,7 +372,7 @@ function MintModal({pool,onClose,onMinted}){
           <div style={{textAlign:"center",padding:"36px 0"}}>
             <div style={{fontSize:32,marginBottom:20,animation:"spinAnim 1s linear infinite",display:"inline-block"}}>⏳</div>
             <div style={{color:pool.color,fontSize:12,letterSpacing:2,marginBottom:8}}>ENTERING POOL...</div>
-            <div style={{color:"#9de8b4",fontSize:9,lineHeight:2}}>Submitting entry on Robinhood Chain</div>
+            <div style={{color:"#9de8b4",fontSize:9,lineHeight:2}}>Submitting entry on Abstract Chain</div>
           </div>
         )}
 
@@ -667,7 +667,7 @@ function WalletSection(){
       </div>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
         <div style={{display:"flex",flexDirection:"column",gap:6}}>
-          <div style={{color:"#9de8b4",fontSize:9,fontFamily:"'Press Start 2P',monospace"}}>CONNECTED VIA ROBINHOOD CHAIN WALLET</div>
+          <div style={{color:"#9de8b4",fontSize:9,fontFamily:"'Press Start 2P',monospace"}}>CONNECTED VIA ABSTRACT GLOBAL WALLET</div>
           <div style={{color:"#1BF26A",fontSize:12,fontFamily:"monospace"}}>
             {addr||"Connect wallet to see address"}
           </div>
@@ -741,7 +741,7 @@ function MyProfile({tickets,wheelPoints,activePerks,addPoints,ethPrice,onMint,on
   const activeTickets=tickets; // all current tickets are active
 
   const handleShare=()=>{
-    navigator.clipboard?.writeText("Check out WheelPool — prize pool dApp on Robinhood Chain! https://wheelpool.vercel.app").catch(()=>{});
+    navigator.clipboard?.writeText("Check out WheelPool — prize pool dApp on Abstract Chain! https://wheelpool.vercel.app").catch(()=>{});
     if(!shared){
       addPoints(100);
       setShared(true);
@@ -1218,6 +1218,123 @@ function CancelModal({modal,tickets,pools,ethPrice,onClose,onConfirm}){
 }
 
 /* ══════════════════════════════════════════════
+   WHEELPOT MODAL — details popup
+══════════════════════════════════════════════ */
+function WheelPotModal({balance,ethPrice,onClose}){
+  const usdValue = Math.round(balance*ethPrice).toLocaleString();
+  const potNeeded = Math.max(0, 1.0 - balance);
+  const potPct = Math.min(100, (balance/1.0)*100);
+
+  // Mock recent contributions — replace with on-chain events once deployed
+  const recentTx = [
+    {pool:"MEGA $25",   amount:"0.000139",  ago:"12 min ago",  hash:"0xa1b2...c3d4"},
+    {pool:"HOURLY $2",  amount:"0.0000111", ago:"38 min ago",  hash:"0xf4e5...a6b7"},
+    {pool:"WEEKLY $10", amount:"0.0000556", ago:"1 hour ago",  hash:"0xb3c4...d5e6"},
+    {pool:"DAILY $5",   amount:"0.0000278", ago:"2 hours ago", hash:"0xd5e6...e7f8"},
+    {pool:"MEGA $25",   amount:"0.000139",  ago:"4 hours ago", hash:"0xe7f8...f9a0"},
+  ];
+
+  return(
+    <div style={{
+      position:"fixed",inset:0,background:"rgba(0,0,0,.88)",
+      display:"flex",alignItems:"center",justifyContent:"center",
+      zIndex:800,padding:"20px",
+    }} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{
+        background:"linear-gradient(160deg,#1a1400,#0e0a00)",
+        border:"2px solid #FFD700",
+        padding:"24px",maxWidth:460,width:"100%",
+        maxHeight:"85vh",overflowY:"auto",
+        boxShadow:"0 0 50px rgba(255,215,0,.35)",
+        fontFamily:"'Press Start 2P',monospace",
+      }}>
+        {/* Header */}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
+          <span style={{color:"#FFD700",fontSize:13}}>🎰 WHEELPOT</span>
+          <button onClick={onClose} style={{
+            background:"transparent",border:"1px solid #FF444466",
+            color:"#FF4444",width:28,height:28,cursor:"pointer",
+            fontSize:14,outline:"none",
+          }}>✕</button>
+        </div>
+
+        {/* Big balance */}
+        <div style={{textAlign:"center",marginBottom:20}}>
+          <div style={{
+            color:"#FFF8DC",fontSize:"clamp(32px,7vw,44px)",
+            fontFamily:"'VT323',monospace",lineHeight:1,
+            textShadow:"0 0 24px rgba(255,215,0,.7)",
+          }}>{balance.toFixed(4)} ETH</div>
+          <div style={{color:"#9de8b4",fontSize:16,fontFamily:"'VT323',monospace",marginTop:4}}>
+            ~${usdValue}
+          </div>
+        </div>
+
+        {/* Progress to eligible */}
+        <div style={{marginBottom:20}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+            <span style={{color:"#9de8b4",fontSize:8}}>PROGRESS TO 1 ETH MINIMUM</span>
+            <span style={{color:"#FFD700",fontSize:8}}>{potPct.toFixed(0)}%</span>
+          </div>
+          <div style={{height:8,background:"#1a1400",border:"1px solid #FFD70044",overflow:"hidden"}}>
+            <div style={{width:`${potPct}%`,height:"100%",background:"linear-gradient(90deg,#B8860B,#FFD700)",transition:"width .5s"}}/>
+          </div>
+          {potNeeded>0&&(
+            <div style={{color:"#9de8b4",fontSize:8,marginTop:6,lineHeight:1.8}}>
+              {potNeeded.toFixed(4)} ETH more needed before the jackpot becomes eligible to fire.
+            </div>
+          )}
+        </div>
+
+        {/* How it works */}
+        <div style={{
+          background:"rgba(255,215,0,0.06)",border:"1px solid #FFD70033",
+          padding:"14px",marginBottom:20,
+        }}>
+          <div style={{color:"#FFD700",fontSize:9,marginBottom:10}}>HOW IT WORKS</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {[
+              ["1%", "of every draw's pool flows into the WheelPot automatically"],
+              ["🎟", "every pool entry earns WheelPot raffle tickets — $2→1, $5→3, $10→6, $25→15"],
+              ["🎲", "fires once the pot reaches 1 ETH and 30 days have passed since the last win"],
+              ["🏆", "one winning ticket takes the entire pot — picked by verifiable randomness"],
+            ].map(([icon,text],i)=>(
+              <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                <span style={{fontSize:12,flexShrink:0,width:20}}>{icon}</span>
+                <span style={{color:"#c0f0b0",fontSize:9,lineHeight:1.8}}>{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent contributions */}
+        <div>
+          <div style={{color:"#FFD700",fontSize:9,marginBottom:10}}>RECENT CONTRIBUTIONS</div>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {recentTx.map((tx,i)=>(
+              <div key={i} style={{
+                display:"flex",justifyContent:"space-between",alignItems:"center",
+                background:"rgba(255,215,0,0.04)",border:"1px solid #FFD70022",
+                padding:"8px 10px",
+              }}>
+                <div>
+                  <div style={{color:"#c0f0b0",fontSize:8}}>{tx.pool}</div>
+                  <div style={{color:"#6a5a2a",fontSize:7,marginTop:3}}>{tx.ago}</div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={{color:"#FFD700",fontSize:11,fontFamily:"'VT323',monospace"}}>+{tx.amount} ETH</div>
+                  <div style={{color:"#6a5a2a",fontSize:7,fontFamily:"monospace",marginTop:3}}>{tx.hash}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════
    WHEEL MARKETPLACE
 ══════════════════════════════════════════════ */
 const PERKS=[
@@ -1396,6 +1513,7 @@ export default function WheelPool(){
   },[]);
   const[burgerOpen,setBurgerOpen]=useState(false);
   const[wheelPotBalance,setWheelPotBalance]=useState(0.847); // mock — replace with contract read
+  const[wheelPotModalOpen,setWheelPotModalOpen]=useState(false);
   const[selectedPeriod,setSelectedPeriod]=useState("h1");
   const[wheelPoints,setWheelPoints]=useState(0);
   const[activePerks,setActivePerks]=useState([]);
@@ -1450,7 +1568,7 @@ export default function WheelPool(){
         <div style={{height:"100%",background:"linear-gradient(90deg,#1BF26A,#FFDD00)",animation:"splashLoad 2.6s linear forwards",borderRadius:2}}/>
       </div>
       <div style={{color:"#6aaa6a",fontSize:"clamp(7px,1.5vw,9px)",letterSpacing:1}}>TAP TO SKIP</div>
-      <div style={{position:"absolute",bottom:24,color:"#3a6a3a",fontSize:"clamp(7px,1.5vw,9px)",letterSpacing:2}}>BUILT ON ROBINHOOD CHAIN</div>
+      <div style={{position:"absolute",bottom:24,color:"#3a6a3a",fontSize:"clamp(7px,1.5vw,9px)",letterSpacing:2}}>BUILT ON ABSTRACT CHAIN</div>
     </div>}
 
     {/* HEADER — sticky, two-row */}
@@ -1574,15 +1692,17 @@ export default function WheelPool(){
           <InteractiveWheel size={wheelSize}/>
         </div>
 
-        {/* ── WheelPot Live Banner ── */}
-        <div style={{
-          position:"absolute",
-          bottom:0,left:0,right:0,
-          zIndex:4,
-          background:"linear-gradient(90deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.7) 20%,rgba(0,0,0,0.7) 80%,rgba(0,0,0,0) 100%)",
-          display:"flex",alignItems:"center",justifyContent:"center",
-          padding:"14px 20px",gap:20,
-        }}>
+        {/* ── WheelPot Live Banner (clickable) ── */}
+        <div
+          onClick={()=>setWheelPotModalOpen(true)}
+          style={{
+            position:"absolute",
+            bottom:0,left:0,right:0,
+            zIndex:4,cursor:"pointer",
+            background:"linear-gradient(90deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.7) 20%,rgba(0,0,0,0.7) 80%,rgba(0,0,0,0) 100%)",
+            display:"flex",alignItems:"center",justifyContent:"center",
+            padding:"14px 20px",gap:20,
+          }}>
           {/* Left: animated slot icon */}
           <div style={{
             fontSize:"clamp(22px,4vw,32px)",
@@ -1615,19 +1735,17 @@ export default function WheelPool(){
             </div>
           </div>
 
-          {/* Right: fire button or countdown */}
-          <div style={{textAlign:"center"}}>
-            <div style={{
-              color:"#FFD700",
-              fontSize:"clamp(8px,1.5vw,10px)",
-              fontFamily:"'Press Start 2P',monospace",
-              marginBottom:4,opacity:0.7,
-            }}>NEXT ELIGIBLE</div>
-            <div style={{
-              color:"#9de8b4",
-              fontSize:"clamp(12px,2.5vw,18px)",
-              fontFamily:"'VT323',monospace",
-            }}>30 DAYS AFTER DEPLOY</div>
+          {/* Right: view details button */}
+          <div style={{
+            background:"rgba(255,215,0,0.12)",
+            border:"1px solid #FFD700",
+            padding:"8px 14px",
+            color:"#FFD700",
+            fontSize:"clamp(8px,1.6vw,10px)",
+            fontFamily:"'Press Start 2P',monospace",
+            whiteSpace:"nowrap",
+          }}>
+            VIEW DETAILS →
           </div>
         </div>
 
@@ -1636,7 +1754,7 @@ export default function WheelPool(){
       {/* ── TITLE + CTA dark band directly below hero ── */}
       <div style={{background:"linear-gradient(180deg,#0f5422 0%,#1a6830 100%)",padding:"36px 20px 32px",textAlign:"center",borderBottom:"2px solid #3a7a22"}}>
         <div style={{fontSize:"clamp(22px,6vw,36px)",color:"#fff",letterSpacing:3,marginBottom:8,fontFamily:"'Press Start 2P',monospace",textShadow:"0 0 30px rgba(27,242,106,.35)"}}>
-          WIN ETH ON <span style={{color:"#1BF26A",textShadow:"0 0 20px #1BF26A"}}>ROBINHOOD CHAIN</span>
+          WIN ETH ON <span style={{color:"#1BF26A",textShadow:"0 0 20px #1BF26A"}}>ABSTRACT CHAIN</span>
         </div>
         <div style={{color:"#c0f0d0",fontSize:"clamp(16px,4vw,20px)",marginBottom:24,fontFamily:"'Press Start 2P',monospace"}}>
           Every draw. Every winner. Paid on-chain.
@@ -1873,7 +1991,7 @@ export default function WheelPool(){
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:14,marginBottom:36}}>
           {[
             ["🎟","1 TICKET = 1 ENTRY","Pay ETH to mint an NFT ticket. More tickets = better odds. Minimum 3 tickets for a draw to run.","#FF6633"],
-            ["⛓","AUTO DRAW","Keeper bot calls executeDraw() on Robinhood Chain at scheduled time. Fully automatic — no manual trigger.","#1BF26A"],
+            ["⛓","AUTO DRAW","Keeper bot calls executeDraw() on Abstract Chain at scheduled time. Fully automatic — no manual trigger.","#1BF26A"],
             ["🔮","VERIFIABLE RANDOM","Chainlink VRF generates a tamper-proof random seed. Results committed on-chain before any animation plays.","#4499FF"],
             ["🎬","WHEEL = REPLAY","The spinning wheel is cosmetic. Results were already final on-chain. It's a replay, not the actual draw.","#FFDD00"],
             ["💸","INSTANT PAYOUT","Winners receive ETH automatically in the same tx as the draw. No claiming. No waiting.","#1BF26A"],
@@ -1892,7 +2010,7 @@ export default function WheelPool(){
           <div style={{color:"#1BF26A",fontSize:13,marginBottom:18,letterSpacing:1}}>⛓ ON-CHAIN DRAW FLOW</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
             {[
-              ["⏱","DRAW TIME","Keeper detects scheduled draw time on Robinhood Chain","#FFDD00"],
+              ["⏱","DRAW TIME","Keeper detects scheduled draw time on Abstract Chain","#FFDD00"],
               ["📤","EXECUTE TX","executeDraw() called. Pool closes. No more ticket mints accepted.","#1BF26A"],
               ["🔮","VRF REQUEST","Contract requests verifiable random seed. 1–2 blocks.","#4499FF"],
               ["🎲","WINNERS SET","VRF seed selects winners. Committed to contract. Immutable.","#AA44FF"],
@@ -1925,7 +2043,7 @@ export default function WheelPool(){
               ["🥇","JACKPOT WINNER","50% of pool","Sent to winner wallet. Same transaction as draw.","#FFD700"],
               ["🥈","2ND PLACE","25% of pool","Sent to winner wallet. Same transaction as draw.","#C0C0C0"],
               ["🥉","3RD PLACE","15% of pool","Sent to winner wallet. Same transaction as draw.","#CD7F32"],
-              ["⚙","OPS + PROTOCOL","10% of pool","Covers: keeper gas, Chainlink VRF, protocol revenue.","#FF6644"],
+              ["⚙","OPS + PROTOCOL","10% of pool","Covers: keeper gas, Chainlink VRF, Abstract paymaster + protocol revenue.","#FF6644"],
             ].map(([ic,l,p,note,c])=>(
               <div key={l} style={{display:"flex",alignItems:"center",gap:8,background:"#0e2008",padding:"8px 12px",borderLeft:`3px solid ${c}`}}>
                 <span style={{fontSize:14,flexShrink:0}}>{ic}</span>
@@ -1936,13 +2054,28 @@ export default function WheelPool(){
               </div>
             ))}
           </div>
-          {/* Automatic payouts callout */}
+          {/* Abstract Chain paymaster callout */}
           <div style={{background:"#0e2008",border:"1px solid #1BF26A55",padding:"16px",marginBottom:10}}>
-            <div style={{color:"#1BF26A",fontSize:12,marginBottom:10,letterSpacing:1}}>⚡ AUTOMATIC PAYOUTS</div>
-            <div style={{fontSize:10,color:"#b0edca",lineHeight:2.4}}>
-              Prizes are sent directly to winners in the same transaction as the draw —
-              <span style={{color:"#1BF26A"}}> no claim button, no separate step</span>.
-              The moment the draw executes on-chain, winnings land in your wallet.
+            <div style={{color:"#1BF26A",fontSize:12,marginBottom:10,letterSpacing:1}}>⚡ ABSTRACT CHAIN PAYMASTER</div>
+            <div style={{fontSize:10,color:"#b0edca",lineHeight:2.4,marginBottom:12}}>
+              Abstract Chain's native account abstraction lets the protocol sponsor gas on behalf of winners.
+              When you receive your prize, <span style={{color:"#1BF26A"}}>you pay zero gas</span> — not even to receive ETH.
+              The paymaster is funded from the 10% ops budget.
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              {[
+                ["🤖","KEEPER GAS","Bot calls executeDraw() at draw time","~2–3%"],
+                ["🔮","CHAINLINK VRF","Cost of verifiable random seed per draw","~1–2%"],
+                ["⛽","PAYMASTER","Sponsors winner gas — zero friction payouts","~1–2%"],
+                ["📈","PROTOCOL REVENUE","Funds dev, liquidity, team","remainder"],
+              ].map(([ic,t,d,pct])=>(
+                <div key={t} style={{display:"flex",alignItems:"center",gap:8,background:"#0e2008",padding:"7px 10px",borderLeft:"2px solid #1BF26A44"}}>
+                  <span style={{fontSize:16,flexShrink:0}}>{ic}</span>
+                  <span style={{color:"#1BF26A",fontSize:10,flexShrink:0,width:90}}>{t}</span>
+                  <span style={{color:"#9de8b4",fontSize:10,flex:1}}>{d}</span>
+                  <span style={{color:"#FFDD00",fontSize:10,flexShrink:0}}>{pct}</span>
+                </div>
+              ))}
             </div>
           </div>
           <div style={{background:"#080f09",border:"1px solid #FF664422",padding:"10px 14px",fontSize:10,color:"#c0f0d0",lineHeight:2.2}}>
@@ -1956,9 +2089,10 @@ export default function WheelPool(){
 
     <footer style={{background:"#0d4a1e",borderTop:"3px solid #1BF26A",padding:"32px 20px",textAlign:"center"}}>
       <div style={{fontSize:16,letterSpacing:2,marginBottom:7}}><span style={{color:"#FFDD00"}}>Wheel</span><span style={{color:"#44FF44"}}>Pool</span></div>
-      <div style={{color:"#c0f0d0",fontSize:"clamp(11px,2.2vw,14px)"}}> Built on Robinhood Chain · NFT Tickets · Auto Payouts · Chainlink VRF</div>
+      <div style={{color:"#c0f0d0",fontSize:"clamp(11px,2.2vw,14px)"}}> Built on Abstract Chain · NFT Tickets · Auto Payouts · Keeper + VRF + Paymaster</div>
     </footer>
 
     {mounted&&drawPool&&<DrawTheater onClose={()=>setDrawPool(null)} onPointsEarned={addPoints} activePerks={activePerks} userTickets={tickets} bgImage={HERO}/>}
     {mounted&&mintPool&&<MintModal pool={mintPool} onClose={()=>setMintPool(null)} onMinted={t=>{setTickets(p=>[t,...p]);setMintPool(null);setNav("tickets");}}/>}
+    {wheelPotModalOpen&&<WheelPotModal balance={wheelPotBalance} ethPrice={ethPrice} onClose={()=>setWheelPotModalOpen(false)}/>}
   </div>);}

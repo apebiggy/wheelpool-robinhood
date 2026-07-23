@@ -441,31 +441,16 @@ function PoolCard({pool,msLeft,myTickets,onMint,onDraw,ethPrice=3000}){
         </div>
       ))}
     </div>
-    {/* minimum ticket progress bar */}
-    <div style={{marginBottom:12}}>
-      <div style={{display:"flex",justifyContent:"space-between",marginBottom:5,fontSize:10}}>
-        <span style={{color:pool.entries>=MIN_TICKETS?"#44FF44":pool.entries===2?"#FFDD00":"#FF6633"}}>{pool.entries>=MIN_TICKETS?"✅ GAME ON":pool.entries===2?"↩ REFUND MODE":"⚠ NEEDS MORE"}</span>
-        <span style={{color:"#b0edca"}}>{Math.min(pool.entries,MIN_TICKETS)}/{MIN_TICKETS} min tickets</span>
-      </div>
-      <div style={{height:6,background:"#0d4a1e",border:"1px solid #2a5a2a",overflow:"hidden"}}>
-        <div style={{height:"100%",width:`${Math.min(pool.entries/MIN_TICKETS*100,100)}%`,background:pool.entries>=MIN_TICKETS?"#44FF44":pool.entries===2?"#FFDD00":"#FF6633",transition:"width .4s"}}/>
-      </div>
-    </div>
-    {/* threshold bar */}
-    <div style={{marginBottom:12}}>
-      <div style={{display:"flex",justifyContent:"space-between",fontSize:10,marginBottom:4}}>
-        <span style={{color:"#9de8b4"}}>TICKETS IN POOL</span>
-        <span style={{color:pool.entries>=3?pool.color:"#FF9933"}}>{pool.entries} / 3 min</span>
-      </div>
-      <div style={{background:"#111",height:6,borderRadius:0,overflow:"hidden"}}>
-        <div style={{width:`${Math.min(100,pool.entries/3*100)}%`,height:"100%",background:pool.entries>=3?pool.color:"#FF9933",transition:"width .4s"}}/>
-      </div>
-      {pool.entries<3&&<div style={{color:"#FF9933",fontSize:10,marginTop:4,textAlign:"center"}}>⚠ NEEDS {3-pool.entries} MORE TICKET{3-pool.entries>1?"S":""} TO DRAW</div>}
-      {pool.entries>=3&&<div style={{color:"#44FF44",fontSize:10,marginTop:4,textAlign:"center"}}>✅ DRAW ACTIVE</div>}
+    {/* Draw status — compact single line, no wrap */}
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,padding:"6px 0",borderTop:"1px solid #2a5a2a44",gap:6,flexWrap:"nowrap"}}>
+      <span style={{color:pool.entries>=MIN_TICKETS?"#44FF44":"#FF9933",fontSize:9,fontFamily:"'Press Start 2P',monospace",whiteSpace:"nowrap"}}>
+        {pool.entries>=MIN_TICKETS?"✅ GAME ON":"⚠ NEEDS "+(MIN_TICKETS-pool.entries)}
+      </span>
+      <span style={{color:"#9de8b4",fontSize:9,fontFamily:"'VT323',monospace",whiteSpace:"nowrap"}}>{Math.min(pool.entries,MIN_TICKETS)}/{MIN_TICKETS}</span>
     </div>
     {myOdds&&<div style={{background:`${pool.color}14`,border:`1px solid ${pool.color}33`,padding:"8px 10px",marginBottom:12,textAlign:"center"}}><span style={{color:pool.color,fontSize:11}}>🎟 {mc} ticket{mc>1?"s":""} · ~{myOdds}% chance per slot</span></div>}
     <div style={{display:"flex",gap:7}}>
-      <button onClick={onMint} style={{flex:2,padding:"11px 0",background:`linear-gradient(90deg,${pool.darkBg},${pool.color}22)`,color:pool.color,border:`2px solid ${pool.color}`,cursor:"pointer",fontSize:"clamp(11px,2.4vw,14px)",fontFamily:"'Press Start 2P',monospace",borderBottom:`4px solid ${pool.color}88`,outline:"none"}}>⛏ MINT TICKET</button>
+      <button onClick={onMint} style={{flex:2,padding:"11px 4px",background:`linear-gradient(90deg,${pool.darkBg},${pool.color}22)`,color:pool.color,border:`2px solid ${pool.color}`,cursor:"pointer",fontSize:"clamp(8px,1.8vw,11px)",fontFamily:"'Press Start 2P',monospace",borderBottom:`4px solid ${pool.color}88`,outline:"none",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>⛏ MINT TICKET</button>
       <button onClick={onDraw} style={{flex:1,padding:"11px 0",background:"#0a0e18",color:"#FFDD00",border:"2px solid #FFDD0066",cursor:"pointer",fontSize:12,fontFamily:"'Press Start 2P',monospace",borderBottom:"4px solid #FFDD0044",outline:"none"}}>🎲 DRAW</button>
     </div>
   </div>);}

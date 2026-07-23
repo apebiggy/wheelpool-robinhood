@@ -450,7 +450,7 @@ function PoolCard({pool,msLeft,myTickets,onMint,onDraw,ethPrice=3000}){
     </div>
     {myOdds&&<div style={{background:`${pool.color}14`,border:`1px solid ${pool.color}33`,padding:"8px 10px",marginBottom:12,textAlign:"center"}}><span style={{color:pool.color,fontSize:11}}>🎟 {mc} ticket{mc>1?"s":""} · ~{myOdds}% chance per slot</span></div>}
     <div style={{display:"flex",gap:7}}>
-      <button onClick={onMint} style={{flex:2,padding:"11px 4px",background:`linear-gradient(90deg,${pool.darkBg},${pool.color}22)`,color:pool.color,border:`2px solid ${pool.color}`,cursor:"pointer",fontSize:"clamp(8px,1.8vw,11px)",fontFamily:"'Press Start 2P',monospace",borderBottom:`4px solid ${pool.color}88`,outline:"none",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>⛏ MINT TICKET</button>
+      <button onClick={onMint} style={{flex:2,padding:"11px 4px",background:`linear-gradient(90deg,${pool.darkBg},${pool.color}22)`,color:pool.color,border:`2px solid ${pool.color}`,cursor:"pointer",fontSize:"clamp(8px,1.8vw,11px)",fontFamily:"'Press Start 2P',monospace",borderBottom:`4px solid ${pool.color}88`,outline:"none",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>🎟 BUY TICKET</button>
       <button onClick={onDraw} style={{flex:1,padding:"11px 0",background:"#0a0e18",color:"#FFDD00",border:"2px solid #FFDD0066",cursor:"pointer",fontSize:12,fontFamily:"'Press Start 2P',monospace",borderBottom:"4px solid #FFDD0044",outline:"none"}}>🎲 DRAW</button>
     </div>
   </div>);}
@@ -1747,7 +1747,7 @@ export default function WheelPool(){
         <div style={{display:"flex",justifyContent:"center",gap:12,flexWrap:"wrap"}}>
           <button onClick={()=>typeof document!=="undefined"&&document.getElementById("pools")?.scrollIntoView({behavior:"smooth"})}
             style={{background:"#c44400",color:"#fff",border:"none",padding:"15px 26px",fontSize:"clamp(11px,2.8vw,14px)",cursor:"pointer",fontFamily:"'Press Start 2P',monospace",borderBottom:"4px solid #FF9900",outline:"none",boxShadow:"0 0 28px rgba(196,68,0,.45)"}}>
-            🎟 MINT A TICKET
+            🎟 BUY A TICKET
           </button>
           <button onClick={()=>setDrawPool(POOLS[3])}
             style={{background:"transparent",color:"#FFDD00",border:"2px solid #FFDD00",padding:"15px 26px",fontSize:"clamp(11px,2.8vw,14px)",cursor:"pointer",fontFamily:"'Press Start 2P',monospace",outline:"none",boxShadow:"0 0 20px rgba(255,221,0,.2)"}}>

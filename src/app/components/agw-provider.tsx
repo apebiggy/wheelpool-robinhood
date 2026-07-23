@@ -24,8 +24,11 @@ export const robinhoodChain = defineChain({
 const config = createConfig({
   chains: [robinhoodChain],
   connectors: [
-    injected(), // MetaMask / standard EVM wallets
+    injected(), // Generic fallback — wagmi auto-discovers all EIP-6963
+                // announced wallets (MetaMask, Coinbase, Rainbow, Trust, etc.)
+                // and lists them individually via useConnectors()
   ],
+  multiInjectedProviderDiscovery: true, // explicit — detects every installed extension wallet
   transports: {
     [robinhoodChain.id]: http(),
   },

@@ -1,71 +1,17 @@
 "use client";
 
-import { useAccount, useConnect, useDisconnect, useBalance, useSwitchChain } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { useAccount, useDisconnect, useBalance } from "wagmi";
 import { formatUnits } from "viem";
 import { useState, useEffect } from "react";
-import { robinhoodChain } from "./agw-provider";
-
-// ── Detect mobile without an injected wallet browser ───────────
-function isMobileWithoutWallet() {
-  if (typeof window === "undefined") return false;
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const hasProvider = typeof (window as any).ethereum !== "undefined";
-  return isMobile && !hasProvider;
-}
-
-// ── Deep link into MetaMask's in-app browser ────────────────────
-function openInMetaMask() {
-  const url = window.location.href.replace(/^https?:\/\//, "");
-  window.location.href = `https://metamask.app.link/dapp/${url}`;
-}
-
-// ── Connect + auto add/switch to Robinhood Chain ────────────────
-async function safeConnect(connect: any, switchChainAsync: any, setError: (s: string) => void) {
-  setError("");
-  if (isMobileWithoutWallet()) {
-    openInMetaMask();
-    return;
-  }
-  try {
-    await connect({ connector: injected() });
-    setTimeout(async () => {
-      try {
-        await switchChainAsync({ chainId: robinhoodChain.id });
-      } catch {
-        if (typeof window !== "undefined" && (window as any).ethereum) {
-          try {
-            await (window as any).ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [{
-                chainId: `0x${robinhoodChain.id.toString(16)}`,
-                chainName: robinhoodChain.name,
-                nativeCurrency: robinhoodChain.nativeCurrency,
-                rpcUrls: [robinhoodChain.rpcUrls.default.http[0]],
-                blockExplorerUrls: [robinhoodChain.blockExplorers.default.url],
-              }],
-            });
-          } catch (addErr) {
-            console.error("Failed to add Robinhood Chain:", addErr);
-          }
-        }
-      }
-    }, 400);
-  } catch (err: any) {
-    console.error("Wallet connect failed:", err);
-    setError(err?.message?.slice(0, 60) || "Connection failed — try again");
-  }
-}
+import { WalletModal } from "./WalletModal";
 
 // ── Main connect button (burger menu) ─────────────────────────
 export function ConnectButton() {
   const { address, status } = useAccount();
-  const { connect } = useConnect();
   const { disconnect } = useDisconnect();
-  const { switchChainAsync } = useSwitchChain();
   const { data: balance } = useBalance({ address });
   const [mounted, setMounted] = useState(false);
-  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const isConnected = mounted && status === "connected" && !!address;
@@ -110,9 +56,9 @@ export function ConnectButton() {
   }
 
   return (
-    <div>
+    <>
       <button
-        onClick={() => safeConnect(connect, switchChainAsync, setError)}
+        onClick={() => setShowModal(true)}
         style={{
           background: "#0d4a1e", border: "2px solid #1BF26A",
           color: "#1BF26A", padding: "7px 12px",
@@ -125,23 +71,17 @@ export function ConnectButton() {
       >
         CONNECT WALLET
       </button>
-      {error && (
-        <div style={{ color: "#FF4444", fontSize: 8, marginTop: 4, fontFamily: "'Press Start 2P',monospace" }}>
-          {error}
-        </div>
-      )}
-    </div>
+      {showModal && <WalletModal onClose={() => setShowModal(false)} />}
+    </>
   );
 }
 
 // ── Compact wallet / connect — shown inline next to logo ───────
 export function CompactWallet() {
   const { address, status } = useAccount();
-  const { connect } = useConnect();
-  const { switchChainAsync } = useSwitchChain();
   const { data: balance } = useBalance({ address });
   const [mounted, setMounted] = useState(false);
-  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const isConnected = mounted && status === "connected" && !!address;
@@ -168,9 +108,9 @@ export function CompactWallet() {
   }
 
   return (
-    <div style={{ position: "relative" }}>
+    <>
       <button
-        onClick={() => safeConnect(connect, switchChainAsync, setError)}
+        onClick={() => setShowModal(true)}
         style={{
           background: "#0d4a1e", border: "2px solid #1BF26A",
           color: "#1BF26A", padding: "6px 12px",
@@ -183,29 +123,17 @@ export function CompactWallet() {
       >
         CONNECT
       </button>
-      {error && (
-        <div style={{
-          position: "absolute", top: "100%", left: 0, right: 0,
-          background: "#2a0808", color: "#FF4444",
-          fontSize: 7, padding: "4px 6px", marginTop: 2,
-          fontFamily: "'Press Start 2P',monospace", zIndex: 500,
-          whiteSpace: "nowrap",
-        }}>
-          {error}
-        </div>
-      )}
-    </div>
+      {showModal && <WalletModal onClose={() => setShowModal(false)} />}
+    </>
   );
 }
 
 // ── Burger wallet — connect/disconnect in menu ─────────────────
 export function BurgerWallet({ onClose }: { onClose: () => void }) {
   const { address, status } = useAccount();
-  const { connect } = useConnect();
   const { disconnect } = useDisconnect();
-  const { switchChainAsync } = useSwitchChain();
   const [mounted, setMounted] = useState(false);
-  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const isConnected = mounted && status === "connected" && !!address;
@@ -228,10 +156,10 @@ export function BurgerWallet({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div>
+    <>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button
-          onClick={() => safeConnect(connect, switchChainAsync, setError)}
+          onClick={() => setShowModal(true)}
           style={{
             flex: 1, background: "#0d4a1e", color: "#1BF26A",
             border: "2px solid #1BF26A", padding: "10px", cursor: "pointer",
@@ -241,11 +169,7 @@ export function BurgerWallet({ onClose }: { onClose: () => void }) {
           }}
         >⚡ CONNECT WALLET</button>
       </div>
-      {error && (
-        <div style={{ color: "#FF4444", fontSize: 8, marginTop: 6, fontFamily: "'Press Start 2P',monospace", lineHeight: 1.6 }}>
-          {error}
-        </div>
-      )}
-    </div>
+      {showModal && <WalletModal onClose={() => { setShowModal(false); onClose(); }} />}
+    </>
   );
 }

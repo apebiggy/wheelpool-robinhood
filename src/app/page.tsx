@@ -1464,10 +1464,8 @@ export default function WheelPool(){
 
         <div style={{flex:1}}/>
 
-        {/* Compact wallet — right side, desktop only */}
-        <div className="compact-wallet-desktop">
-          <CompactWallet/>
-        </div>
+        {/* Compact wallet / connect — visible on all screens */}
+        <CompactWallet/>
 
         {/* Burger button */}
         <button onClick={()=>setBurgerOpen(o=>!o)} style={{
@@ -1491,7 +1489,19 @@ export default function WheelPool(){
         borderTop:"2px solid #1BF26A",zIndex:400,
         boxShadow:"0 8px 32px rgba(0,0,0,.8)",
       }}>
-        <div style={{padding:"14px 16px",borderBottom:"1px solid #1a4a1a"}}>
+        {/* Close X header */}
+        <div style={{
+          display:"flex",justifyContent:"flex-end",
+          padding:"8px 12px 0",
+        }}>
+          <button onClick={()=>setBurgerOpen(false)} style={{
+            background:"transparent",border:"1px solid #FF444466",
+            color:"#FF4444",width:28,height:28,
+            cursor:"pointer",fontSize:14,outline:"none",
+            display:"flex",alignItems:"center",justifyContent:"center",
+          }}>✕</button>
+        </div>
+        <div style={{padding:"10px 16px 14px",borderBottom:"1px solid #1a4a1a"}}>
           <BurgerWallet onClose={()=>setBurgerOpen(false)}/>
         </div>
         {[

@@ -1429,7 +1429,19 @@ export default function WheelPool(){
       zIndex:9999,display:"flex",flexDirection:"column",
       alignItems:"center",justifyContent:"center",cursor:"pointer",
     }}>
-      <div style={{fontSize:"clamp(80px,20vw,130px)",animation:"spinAnim 1.2s linear infinite",marginBottom:20,filter:"drop-shadow(0 0 30px rgba(27,242,106,.6))"}}>🎡</div>
+      <div style={{marginBottom:20,animation:"spinAnim 1.2s linear infinite",filter:"drop-shadow(0 0 30px rgba(27,242,106,.6))"}}>
+        <svg width="clamp(80px,20vw,130px)" height="clamp(80px,20vw,130px)" viewBox="0 0 100 100" style={{width:"clamp(80px,20vw,130px)",height:"clamp(80px,20vw,130px)"}}>
+          <circle cx="50" cy="50" r="46" fill="#0a2e10" stroke="#1BF26A" strokeWidth="2"/>
+          {Array.from({length:8}).map((_,i)=>{
+            const a1=(i/8)*2*Math.PI-Math.PI/2, a2=((i+1)/8)*2*Math.PI-Math.PI/2;
+            const cx=50, cy=50, r=42;
+            const colors=["#1BF26A","#0cba48","#FFDD00","#1BF26A","#0cba48","#FFDD00","#1BF26A","#0cba48"];
+            return <path key={i} d={`M${cx},${cy} L${cx+r*Math.cos(a1)},${cy+r*Math.sin(a1)} A${r},${r} 0 0,1 ${cx+r*Math.cos(a2)},${cy+r*Math.sin(a2)}Z`} fill={colors[i]} stroke="#0a2e10" strokeWidth="1.5"/>;
+          })}
+          <circle cx="50" cy="50" r="10" fill="#0a2e10" stroke="#1BF26A" strokeWidth="2.5"/>
+          <circle cx="50" cy="50" r="5" fill="#1BF26A"/>
+        </svg>
+      </div>
       <div style={{fontSize:"clamp(28px,7vw,52px)",letterSpacing:3,marginBottom:10}}>
         <span style={{color:"#FFDD00"}}>Wheel</span><span style={{color:"#44FF44"}}>Pool</span>
       </div>

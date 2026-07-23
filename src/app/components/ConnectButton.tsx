@@ -6,34 +6,55 @@ import { formatUnits } from "viem";
 import { useState, useEffect } from "react";
 import { robinhoodChain } from "./agw-provider";
 
-// ── Shared: connect + auto add/switch to Robinhood Chain ──────
-async function connectAndEnsureChain(connect: any, switchChainAsync: any) {
-  connect({ connector: injected() });
+// ── Detect mobile without an injected wallet browser ───────────
+function isMobileWithoutWallet() {
+  if (typeof window === "undefined") return false;
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const hasProvider = typeof (window as any).ethereum !== "undefined";
+  return isMobile && !hasProvider;
+}
 
-  // Give the wallet a moment to connect before attempting chain switch
-  setTimeout(async () => {
-    try {
-      await switchChainAsync({ chainId: robinhoodChain.id });
-    } catch (err: any) {
-      // Chain not added to wallet yet — request wallet to add it (EIP-3085)
-      if (typeof window !== "undefined" && (window as any).ethereum) {
-        try {
-          await (window as any).ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [{
-              chainId: `0x${robinhoodChain.id.toString(16)}`,
-              chainName: robinhoodChain.name,
-              nativeCurrency: robinhoodChain.nativeCurrency,
-              rpcUrls: [robinhoodChain.rpcUrls.default.http[0]],
-              blockExplorerUrls: [robinhoodChain.blockExplorers.default.url],
-            }],
-          });
-        } catch (addErr) {
-          console.error("Failed to add Robinhood Chain to wallet:", addErr);
+// ── Deep link into MetaMask's in-app browser ────────────────────
+function openInMetaMask() {
+  const url = window.location.href.replace(/^https?:\/\//, "");
+  window.location.href = `https://metamask.app.link/dapp/${url}`;
+}
+
+// ── Connect + auto add/switch to Robinhood Chain ────────────────
+async function safeConnect(connect: any, switchChainAsync: any, setError: (s: string) => void) {
+  setError("");
+  if (isMobileWithoutWallet()) {
+    openInMetaMask();
+    return;
+  }
+  try {
+    await connect({ connector: injected() });
+    setTimeout(async () => {
+      try {
+        await switchChainAsync({ chainId: robinhoodChain.id });
+      } catch {
+        if (typeof window !== "undefined" && (window as any).ethereum) {
+          try {
+            await (window as any).ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                chainId: `0x${robinhoodChain.id.toString(16)}`,
+                chainName: robinhoodChain.name,
+                nativeCurrency: robinhoodChain.nativeCurrency,
+                rpcUrls: [robinhoodChain.rpcUrls.default.http[0]],
+                blockExplorerUrls: [robinhoodChain.blockExplorers.default.url],
+              }],
+            });
+          } catch (addErr) {
+            console.error("Failed to add Robinhood Chain:", addErr);
+          }
         }
       }
-    }
-  }, 400);
+    }, 400);
+  } catch (err: any) {
+    console.error("Wallet connect failed:", err);
+    setError(err?.message?.slice(0, 60) || "Connection failed — try again");
+  }
 }
 
 // ── Main connect button (burger menu) ─────────────────────────
@@ -44,6 +65,7 @@ export function ConnectButton() {
   const { switchChainAsync } = useSwitchChain();
   const { data: balance } = useBalance({ address });
   const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState("");
   useEffect(() => setMounted(true), []);
 
   const isConnected = mounted && status === "connected" && !!address;
@@ -88,29 +110,38 @@ export function ConnectButton() {
   }
 
   return (
-    <button
-      onClick={() => connectAndEnsureChain(connect, switchChainAsync)}
-      style={{
-        background: "#0d4a1e", border: "2px solid #1BF26A",
-        color: "#1BF26A", padding: "7px 12px",
-        cursor: "pointer", fontSize: "clamp(8px,2vw,10px)",
-        fontFamily: "'Press Start 2P',monospace",
-        whiteSpace: "nowrap", outline: "none",
-      }}
-    >
-      CONNECT WALLET
-    </button>
+    <div>
+      <button
+        onClick={() => safeConnect(connect, switchChainAsync, setError)}
+        style={{
+          background: "#0d4a1e", border: "2px solid #1BF26A",
+          color: "#1BF26A", padding: "7px 12px",
+          cursor: "pointer", fontSize: "clamp(8px,2vw,10px)",
+          fontFamily: "'Press Start 2P',monospace",
+          whiteSpace: "nowrap", outline: "none",
+          WebkitTapHighlightColor: "transparent",
+          touchAction: "manipulation",
+        }}
+      >
+        CONNECT WALLET
+      </button>
+      {error && (
+        <div style={{ color: "#FF4444", fontSize: 8, marginTop: 4, fontFamily: "'Press Start 2P',monospace" }}>
+          {error}
+        </div>
+      )}
+    </div>
   );
 }
 
 // ── Compact wallet / connect — shown inline next to logo ───────
-// Shows CONNECT button when disconnected, wallet pill when connected
 export function CompactWallet() {
   const { address, status } = useAccount();
   const { connect } = useConnect();
   const { switchChainAsync } = useSwitchChain();
   const { data: balance } = useBalance({ address });
   const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState("");
   useEffect(() => setMounted(true), []);
 
   const isConnected = mounted && status === "connected" && !!address;
@@ -137,18 +168,33 @@ export function CompactWallet() {
   }
 
   return (
-    <button
-      onClick={() => connectAndEnsureChain(connect, switchChainAsync)}
-      style={{
-        background: "#0d4a1e", border: "2px solid #1BF26A",
-        color: "#1BF26A", padding: "6px 12px",
-        cursor: "pointer", fontSize: "clamp(8px,1.8vw,10px)",
-        fontFamily: "'Press Start 2P',monospace",
-        whiteSpace: "nowrap", outline: "none",
-      }}
-    >
-      CONNECT
-    </button>
+    <div style={{ position: "relative" }}>
+      <button
+        onClick={() => safeConnect(connect, switchChainAsync, setError)}
+        style={{
+          background: "#0d4a1e", border: "2px solid #1BF26A",
+          color: "#1BF26A", padding: "6px 12px",
+          cursor: "pointer", fontSize: "clamp(8px,1.8vw,10px)",
+          fontFamily: "'Press Start 2P',monospace",
+          whiteSpace: "nowrap", outline: "none",
+          WebkitTapHighlightColor: "transparent",
+          touchAction: "manipulation",
+        }}
+      >
+        CONNECT
+      </button>
+      {error && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0,
+          background: "#2a0808", color: "#FF4444",
+          fontSize: 7, padding: "4px 6px", marginTop: 2,
+          fontFamily: "'Press Start 2P',monospace", zIndex: 500,
+          whiteSpace: "nowrap",
+        }}>
+          {error}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -159,6 +205,7 @@ export function BurgerWallet({ onClose }: { onClose: () => void }) {
   const { disconnect } = useDisconnect();
   const { switchChainAsync } = useSwitchChain();
   const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState("");
   useEffect(() => setMounted(true), []);
 
   const isConnected = mounted && status === "connected" && !!address;
@@ -181,12 +228,24 @@ export function BurgerWallet({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-      <button onClick={() => { connectAndEnsureChain(connect, switchChainAsync); onClose(); }} style={{
-        flex: 1, background: "#0d4a1e", color: "#1BF26A",
-        border: "2px solid #1BF26A", padding: "10px", cursor: "pointer",
-        fontSize: 10, fontFamily: "'Press Start 2P',monospace", outline: "none",
-      }}>⚡ CONNECT WALLET</button>
+    <div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <button
+          onClick={() => safeConnect(connect, switchChainAsync, setError)}
+          style={{
+            flex: 1, background: "#0d4a1e", color: "#1BF26A",
+            border: "2px solid #1BF26A", padding: "10px", cursor: "pointer",
+            fontSize: 10, fontFamily: "'Press Start 2P',monospace", outline: "none",
+            WebkitTapHighlightColor: "transparent",
+            touchAction: "manipulation",
+          }}
+        >⚡ CONNECT WALLET</button>
+      </div>
+      {error && (
+        <div style={{ color: "#FF4444", fontSize: 8, marginTop: 6, fontFamily: "'Press Start 2P',monospace", lineHeight: 1.6 }}>
+          {error}
+        </div>
+      )}
     </div>
   );
 }

@@ -446,12 +446,12 @@ function PoolCard({pool,msLeft,myTickets,onMint,onDraw,ethPrice=3000}){
       <span style={{color:pool.entries>=MIN_TICKETS?"#44FF44":"#FF9933",fontSize:9,fontFamily:"'Press Start 2P',monospace",whiteSpace:"nowrap"}}>
         {pool.entries>=MIN_TICKETS?"✅ GAME ON":"⚠ NEEDS "+(MIN_TICKETS-pool.entries)}
       </span>
-      <span style={{color:"#9de8b4",fontSize:9,fontFamily:"'VT323',monospace",whiteSpace:"nowrap"}}>{Math.min(pool.entries,MIN_TICKETS)}/{MIN_TICKETS}</span>
+      <span style={{color:"#9de8b4",fontSize:15,fontFamily:"'VT323',monospace",whiteSpace:"nowrap"}}>{Math.min(pool.entries,MIN_TICKETS)}/{MIN_TICKETS}</span>
     </div>
     {myOdds&&<div style={{background:`${pool.color}14`,border:`1px solid ${pool.color}33`,padding:"8px 10px",marginBottom:12,textAlign:"center"}}><span style={{color:pool.color,fontSize:11}}>🎟 {mc} ticket{mc>1?"s":""} · ~{myOdds}% chance per slot</span></div>}
     <div style={{display:"flex",gap:7}}>
-      <button onClick={onMint} style={{flex:2,padding:"11px 4px",background:`linear-gradient(90deg,${pool.darkBg},${pool.color}22)`,color:pool.color,border:`2px solid ${pool.color}`,cursor:"pointer",fontSize:"clamp(8px,1.8vw,11px)",fontFamily:"'Press Start 2P',monospace",borderBottom:`4px solid ${pool.color}88`,outline:"none",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>🎟 BUY TICKET</button>
-      <button onClick={onDraw} style={{flex:1,padding:"11px 0",background:"#0a0e18",color:"#FFDD00",border:"2px solid #FFDD0066",cursor:"pointer",fontSize:12,fontFamily:"'Press Start 2P',monospace",borderBottom:"4px solid #FFDD0044",outline:"none"}}>🎲 DRAW</button>
+      <button onClick={onMint} style={{flex:2,padding:"11px 2px",background:`linear-gradient(90deg,${pool.darkBg},${pool.color}22)`,color:pool.color,border:`2px solid ${pool.color}`,cursor:"pointer",fontSize:"clamp(7px,1.4vw,9px)",fontFamily:"'Press Start 2P',monospace",borderBottom:`4px solid ${pool.color}88`,outline:"none",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>🎟 BUY TICKET</button>
+      <button onClick={onDraw} style={{flex:1,padding:"11px 2px",background:"#0a0e18",color:"#FFDD00",border:"2px solid #FFDD0066",cursor:"pointer",fontSize:"clamp(7px,1.4vw,10px)",fontFamily:"'Press Start 2P',monospace",borderBottom:"4px solid #FFDD0044",outline:"none",whiteSpace:"nowrap"}}>🎲 DRAW</button>
     </div>
   </div>);}
 
